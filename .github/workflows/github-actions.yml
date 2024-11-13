@@ -48,3 +48,6 @@ jobs:
             docker-compose down
             docker-compose pull
             docker-compose up -d
+            
+            # spring_app 컨테이너의 로그 출력
+            docker logs spring_app
