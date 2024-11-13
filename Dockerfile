@@ -11,7 +11,7 @@ RUN chmod +x gradlew
 # 의존성 부분은 변경이 없으므로 캐싱된 의존성을 그대로 가져와 빌드 속도 향상에 도움
 COPY build.gradle .
 COPY settings.gradle .
-RUN ./gradlew dependencies -i -s
+RUN ./gradlew dependencies
 
 # 소스코드 복사 및 빌드
 COPY ./ ./
