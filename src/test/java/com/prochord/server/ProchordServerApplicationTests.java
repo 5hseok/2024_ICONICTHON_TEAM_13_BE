@@ -1,4 +1,4 @@
-package com.prochord.PROCHORD_SERVER;
+package com.prochord.server;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
