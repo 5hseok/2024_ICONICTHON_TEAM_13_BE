@@ -7,10 +7,11 @@ COPY gradle gradle
 RUN chmod +x gradlew
 
 # 의존성 파일 복사 및 다운로드
-# 이렇게 미리 해두면 소스에서 변경사항이 생겼을 때 필요한 소스부분만 다시 빌드하면 되고,
-# 의존성 부분은 변경이 없으므로 캐싱된 의존성을 그대로 가져와 빌드 속도 향상에 도움
 COPY build.gradle .
 COPY settings.gradle .
+COPY src/main/resources/application.yml /app/src/main/resources/
+
+# 의존성 다운로드
 RUN ./gradlew dependencies
 
 # 소스코드 복사 및 빌드
@@ -20,5 +21,4 @@ RUN ./gradlew clean build -x test
 # 실행 스테이지
 FROM openjdk:21-jdk-slim
 COPY --from=builder /app/build/libs/*.jar /app/app.jar
-ENTRYPOINT ["java", "-Dspring.profiles.active=docker"]
-CMD ["-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=docker", "-jar", "/app/app.jar"]
