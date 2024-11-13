@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-slim AS builder
+FROM openjdk:21-jdk-slim AS builder
 WORKDIR /app
 
 # Gradle Wrapper 복사
@@ -11,14 +11,14 @@ RUN chmod +x gradlew
 # 의존성 부분은 변경이 없으므로 캐싱된 의존성을 그대로 가져와 빌드 속도 향상에 도움
 COPY build.gradle .
 COPY settings.gradle .
-RUN ./gradlew dependencies
+RUN ./gradlew dependencies -i -s
 
 # 소스코드 복사 및 빌드
 COPY ./ ./
 RUN ./gradlew clean build -x test
 
 # 실행 스테이지
-FROM openjdk:17-jdk-slim
+FROM openjdk:21-jdk-slim
 COPY --from=builder /app/build/libs/*.jar /app/app.jar
 ENTRYPOINT ["java", "-Dspring.profiles.active=docker"]
 CMD ["-jar", "/app/app.jar"]
