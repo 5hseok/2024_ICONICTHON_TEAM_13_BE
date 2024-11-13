@@ -8,17 +8,12 @@ build/
 # 환경 설정 및 기타 설정 파일
 .gitignore
 
-# Gradle Wrapper 및 설정 파일
-gradlew
-gradlew.bat
-gradle/
-
-# 문서 파일
-HELP.md
-README.md
-
 # 배포 스크립트
 deploy.sh
 
 # Docker Compose 파일
 docker-compose.yml
+
+# 문서 파일
+HELP.md
+README.md
