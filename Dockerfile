@@ -4,7 +4,7 @@ WORKDIR /app
 # Gradle Wrapper 복사
 COPY gradlew .
 COPY gradle gradle
-RUN chmod +x ./gradlew
+RUN chmod +x gradlew
 
 # 의존성 파일 복사 및 다운로드
 # 이렇게 미리 해두면 소스에서 변경사항이 생겼을 때 필요한 소스부분만 다시 빌드하면 되고,
