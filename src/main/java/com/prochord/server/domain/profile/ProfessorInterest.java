@@ -15,21 +15,18 @@ import org.hibernate.annotations.OnDeleteAction;
 @Builder
 @Getter
 @Entity
-@Table(name = "professor_interest", schema = "PROCHORD")
-
+@Table(name = "professor_interest")
 public class ProfessorInterest {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(name = "id", nullable = false)
         private Long id;
 
-        @NotNull
+        @Column(name = "interest", nullable = false, length = 20)
+        private String interest;
+
         @ManyToOne(fetch = FetchType.LAZY, optional = false)
         @OnDelete(action = OnDeleteAction.CASCADE)
         @JoinColumn(name = "professor_id", nullable = false)
         private Professor professor;
-
-        @NotNull
-        @Column(name = "interest", nullable = false, length = 20)
-        private String interest;
     }

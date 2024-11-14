@@ -1,5 +1,6 @@
 package com.prochord.server.domain.post;
 
+import com.prochord.server.domain.member.Professor;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,16 +20,18 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "professor_id", nullable = false)
-    private Long professorId;
-
-    @Column(name = "field", nullable = false)
-    private String field;
+    @Column(name = "title", nullable = false)
+    private String title;
 
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "created", nullable = false)
-    @Temporal(TemporalType.DATE)
-    private Date created;
+    @Column(name = "createdDate", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "professor_id", nullable = false)
+    private Professor professor;
+
 }

@@ -1,5 +1,7 @@
 package com.prochord.server.domain.post;
 
+import com.prochord.server.domain.member.Professor;
+import com.prochord.server.domain.member.Student;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,12 +19,15 @@ public class Like {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "post_id", nullable = false)
-    private Long postId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="post_id", nullable = false)
+    private Post post;
 
-    @Column(name = "professor_id", nullable = false)
-    private Long professorId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="professor_id", nullable = false)
+    private Professor professor;
 
-    @Column(name = "student_id", nullable = false)
-    private Long studentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="student_id", nullable = false)
+    private Student student;
 }

@@ -1,6 +1,8 @@
 package com.prochord.server.domain.profile;
 
 
+import com.prochord.server.domain.member.Professor;
+import com.prochord.server.domain.member.Student;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,9 +20,11 @@ public class StudentSubscribeProfessor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "student", nullable = false)
-    private Long student;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id")
+    private Student student;
 
-    @Column(name = "professor_id", nullable = false)
-    private Long professorId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "professor_id")
+    private Professor professor;
 }

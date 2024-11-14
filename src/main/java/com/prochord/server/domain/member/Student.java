@@ -9,6 +9,7 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
+@NoArgsConstructor
 @Entity
 @Table(name = "student")
 public class Student extends Member {
