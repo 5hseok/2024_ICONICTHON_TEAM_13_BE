@@ -3,6 +3,7 @@ package com.prochord.server.service;
 import com.prochord.server.domain.member.Member;
 import com.prochord.server.domain.member.Professor;
 import com.prochord.server.domain.member.Student;
+import com.prochord.server.domain.profile.ProfessorInterest;
 import com.prochord.server.dto.member.request.MemberCreateRequest;
 import com.prochord.server.dto.member.request.MemberLoginRequest;
 import com.prochord.server.dto.member.response.MemberLoginResponse;
@@ -12,6 +13,7 @@ import com.prochord.server.global.exception.message.ErrorMessage;
 import com.prochord.server.global.jwt.JwtTokenProvider;
 import com.prochord.server.global.jwt.JwtValidationType;
 import com.prochord.server.global.jwt.UserAuthentication;
+import com.prochord.server.repository.ProfessorInterestRepository;
 import com.prochord.server.repository.ProfessorRepository;
 import com.prochord.server.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.addAll;
 
 @Slf4j // 다양한 로깅 프레임워크(예: Logback, Log4j, JUL)를 사용할 수 있게하는 어노테이션
 @Service
@@ -31,6 +37,7 @@ public class MemberService {
     private final StudentRepository studentRepository;
     private final ProfessorRepository professorRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ProfessorInterestRepository professorInterestRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
     // 로그아웃된 토큰을 저장하는 블랙리스트
@@ -38,6 +45,7 @@ public class MemberService {
 
     @Transactional
     public MemberResponse signUp(MemberCreateRequest memberCreateRequest) {
+
         // 이메일 중복 체크 (학생과 교수 모두 확인)
         if (studentRepository.findByEmail(memberCreateRequest.getEmail()).isPresent() ||
                 professorRepository.findByEmail(memberCreateRequest.getEmail()).isPresent()) {
@@ -56,7 +64,8 @@ public class MemberService {
                     .build();
             return MemberResponse.of(studentRepository.save((Student) member).getId());
         } else if (memberCreateRequest.getUserType() == 1) { // 교수인 경우
-            member = Professor.builder()
+            // 교수 객체 생성
+            Professor professor = Professor.builder()
                     .name(memberCreateRequest.getName())
                     .birth(memberCreateRequest.getBirth())
                     .email(memberCreateRequest.getEmail())
@@ -64,7 +73,23 @@ public class MemberService {
                     .gender(memberCreateRequest.getGender())
                     .department(memberCreateRequest.getDepartment())
                     .build();
-            return MemberResponse.of(professorRepository.save((Professor) member).getId());
+
+            // 교수 저장 (우선 영속화하여 ID 생성)
+            professor = professorRepository.save(professor);
+
+            // 교수 관심사 추가
+            if (memberCreateRequest.getInterests() != null && !memberCreateRequest.getInterests().isEmpty()) {
+                for (String interestName : memberCreateRequest.getInterests()) {
+                    ProfessorInterest interest = ProfessorInterest.builder()
+                            .interest(interestName)
+                            .professor(professor) // 관심사를 해당 교수와 매핑
+                            .build();
+                    // 관심사 저장
+                    professorInterestRepository.save(interest);
+                }
+            }
+
+            return MemberResponse.of(professor.getId());
         } else {
             throw new BusinessException(ErrorMessage.InVALID_USERTYPE);
         }

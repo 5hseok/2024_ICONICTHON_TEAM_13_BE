@@ -21,10 +21,6 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("/test")
-    public ResponseEntity<String> test() {
-        return ResponseEntity.status(HttpStatus.OK).body("test");
-    }
     // 회원가입
     @PostMapping("/register")
     public ResponseEntity<SuccessStatusResponse<MemberResponse>> signUp(@Valid @RequestBody MemberCreateRequest userCreateRequest) {
