@@ -56,7 +56,6 @@ public class MemberService {
                     .email(memberCreateRequest.getEmail())
                     .password(passwordEncoder.encode(memberCreateRequest.getPassword()))
                     .gender(memberCreateRequest.getGender())
-                    .number(memberCreateRequest.getNumber())
                     .build();
             return MemberResponse.of(studentRepository.save((Student) member).getId());
         } else if (memberCreateRequest.getUserType() == 1) { // 교수인 경우
@@ -66,7 +65,6 @@ public class MemberService {
                     .email(memberCreateRequest.getEmail())
                     .password(passwordEncoder.encode(memberCreateRequest.getPassword()))
                     .gender(memberCreateRequest.getGender())
-                    .number(memberCreateRequest.getNumber())
                     .department(memberCreateRequest.getDepartment())
                     .build();
             return MemberResponse.of(professorRepository.save((Professor) member).getId());

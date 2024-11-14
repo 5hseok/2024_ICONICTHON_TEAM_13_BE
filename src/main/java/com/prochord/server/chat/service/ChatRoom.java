@@ -1,3 +1,5 @@
+
+
 package com.prochord.server.chat.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,19 +29,76 @@ public class ChatRoom {
      * @param session 웹소켓 세션
      */
     public void enter(ChatDto chatDto, WebSocketSession session) {
-        String username = (String) session.getAttributes().get("username");
-        activeUserMap.put(username, session);
-        sendToAllExceptSender(WebSocketMessageType.ENTER, chatDto, username);
+        String username = chatDto.getUsername();
+
+        // username 또는 session이 null이면 로그를 찍고 메소드 종료
+        if (username == null || session == null) {
+            log.error("Cannot enter chat room. Username or session is null. Username: {}, Session: {}", username, session);
+            return;
+        }
+
+        activeUserMap.put(username, session);  // Null 체크 후 put 실행
+
+        // 채팅방에 이미 있는 사용자들에게 입장 알림 보내기
+        for (Map.Entry<String, WebSocketSession> entry : activeUserMap.entrySet()) {
+            try {
+                WebSocketSession userSession = entry.getValue();
+                if (userSession.isOpen()) {  // 세션이 열려 있는지 확인
+                    userSession.sendMessage(getTextMessage(WebSocketMessageType.ENTER, chatDto));
+                } else {
+                    log.warn("Session for user {} is closed. Removing from activeUserMap.", entry.getKey());
+                    activeUserMap.remove(entry.getKey());
+                }
+            } catch (Exception e) {
+                log.error("Failed to send enter message to {}: {}", entry.getKey(), e.getMessage());
+            }
+        }
     }
 
     /**
+     * 채팅방 참여 (JOIN)
+     * @param chatDto ChatDto
+     * @param session 웹소켓 세션
+     */
+    public void join(ChatDto chatDto, WebSocketSession session) {
+        String username = chatDto.getUsername();
+
+        // username 또는 session이 null이면 로그를 찍고 메소드 종료
+        if (username == null || session == null) {
+            log.error("Cannot join chat room. Username or session is null. Username: {}, Session: {}", username, session);
+            return;
+        }
+
+        // 사용자 맵에 사용자 추가
+        activeUserMap.put(username, session);
+
+        // 채팅방에 이미 있는 사용자들에게 참가 알림 보내기
+        for (Map.Entry<String, WebSocketSession> entry : activeUserMap.entrySet()) {
+            try {
+                WebSocketSession userSession = entry.getValue();
+                if (userSession.isOpen()) {  // 세션이 열려 있는지 확인
+                    userSession.sendMessage(getTextMessage(WebSocketMessageType.JOIN, chatDto));
+                } else {
+                    log.warn("Session for user {} is closed. Removing from activeUserMap.", entry.getKey());
+                    activeUserMap.remove(entry.getKey());
+                }
+            } catch (Exception e) {
+                log.error("Failed to send join message to {}: {}", entry.getKey(), e.getMessage());
+            }
+        }
+    }
+
+
+    /**
      * 채팅방 퇴장
-     * @param username 사용자 이름
      * @param chatDto ChatDto
      */
-    public void exit(String username, ChatDto chatDto) {
+    public void exit(ChatDto chatDto) {
+        String username = chatDto.getUsername();
         activeUserMap.remove(username);
+        log.info("User {} has left the chat room.", username);
         sendToAllExceptSender(WebSocketMessageType.EXIT, chatDto, username);
+        log.info("Current active users: {}", activeUserMap.keySet());
     }
 
     /**

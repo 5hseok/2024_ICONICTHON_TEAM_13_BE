@@ -12,7 +12,6 @@ import org.springframework.web.socket.config.annotation.*;
 public class WebSocketConfig implements WebSocketConfigurer {
 
     private final WebSocketChatHandler webSocketChatHandler;
-//    private final WebSocketAuthInterceptor webSocketAuthInterceptor;
 
 
 //    @Override

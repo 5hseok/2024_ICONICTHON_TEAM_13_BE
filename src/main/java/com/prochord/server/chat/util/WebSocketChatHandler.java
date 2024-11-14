@@ -12,6 +12,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,34 +26,12 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws JsonProcessingException {
         String username = (String) session.getAttributes().get("username");
-        WebSocketMessage webSocketMessage = objectMapper.readValue(message.getPayload(), WebSocketMessage.class);
-
+        WebSocketMessage webSocketMessage = (WebSocketMessage) objectMapper.readValue(message.getPayload(), WebSocketMessage.class);
         switch (webSocketMessage.getType().getValue()) {
             case "ENTER" -> enterChatRoom(webSocketMessage.getPayload(), session);
-            case "TALK" -> {
-                ChatDto chatDto = webSocketMessage.getPayload();
-                ChatRoom chatRoom = chatRoomMap.get(chatDto.getChatRoomId());
-                if (chatRoom == null) {
-                    log.error("Chat room with ID {} does not exist. Message cannot be delivered.", chatDto.getChatRoomId());
-                    try {
-                        session.sendMessage(new TextMessage("Error: Chat room does not exist."));
-                    } catch (Exception e) {
-                        log.error("Failed to send error message to user {}: {}", username, e.getMessage());
-                    }
-                } else {
-                    sendMessage(username, chatDto);
-                }
-            }
-            case "EXIT" -> {
-                ChatDto chatDto = webSocketMessage.getPayload();
-                ChatRoom chatRoom = chatRoomMap.get(chatDto.getChatRoomId());
-                if (chatRoom != null) {
-                    exitChatRoom(username, chatDto);
-                } else {
-                    log.warn("User {} attempted to exit a non-existent chat room with ID {}", username, chatDto.getChatRoomId());
-                }
-            }
-            default -> log.warn("Unsupported message type received: {}", webSocketMessage.getType().getValue());
+            case "TALK" -> sendMessage(username, webSocketMessage.getPayload());
+            case "EXIT" -> exitChatRoom(session, webSocketMessage.getPayload());
+            case "JOIN" -> joinChatRoom(webSocketMessage.getPayload(), session);
         }
     }
 
@@ -61,8 +40,9 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
      * @param chatDto ChatDto
      */
     private void sendMessage(String username, ChatDto chatDto) {
-        log.info("send chatDto : " + chatDto.toString());
+        log.info("send chatDto : {}", chatDto.toString());
         ChatRoom chatRoom = chatRoomMap.get(chatDto.getChatRoomId());
+        log.info("chatRoomMap : {}", chatRoomMap.toString());
         chatRoom.sendMessage(username, chatDto);
     }
 
@@ -72,27 +52,60 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
      * @param session 웹소켓 세션
      */
     private void enterChatRoom(ChatDto chatDto, WebSocketSession session) {
-        log.info("enter chatDto : " + chatDto.toString());
+        log.info("Entering chat room with chatDto: {}", chatDto.toString());
+        log.info("Current chatRoomMap: {}", chatRoomMap.toString());
+
+        ChatRoom chatRoom = chatRoomMap.get(chatDto.getChatRoomId());
+        if (chatRoom == null) {
+            log.info("Chat room with id {} not found. Creating a new chat room.", chatDto.getChatRoomId());
+            chatRoom = new ChatRoom(objectMapper);
+        }
+        log.info("Chat room: {}", chatRoom.toString());
         chatDto.setMessage(chatDto.getUsername() + "님이 입장하셨습니다.");
-        ChatRoom chatRoom = chatRoomMap.getOrDefault(chatDto.getChatRoomId(), new ChatRoom(objectMapper));
+        log.info("ChatDto: {}", chatDto.toString());
         chatRoom.enter(chatDto, session);
+
         chatRoomMap.put(chatDto.getChatRoomId(), chatRoom);
-        log.info("Chat room {} added to chatRoomMap.", chatDto.getChatRoomId());
+        log.info("Updated chatRoomMap: {}", chatRoomMap.toString());
+    }
+
+    /**
+     * 채팅방 참여 (JOIN)
+     * @param chatDto ChatDto
+     * @param session 웹소켓 세션
+     */
+    private void joinChatRoom(ChatDto chatDto, WebSocketSession session) {
+        log.info("Joining chat room with chatDto: {}", chatDto.toString());
+        ChatRoom chatRoom = chatRoomMap.get(chatDto.getChatRoomId());
+        if (chatRoom == null) {
+            log.error("Chat room with id {} not found.", chatDto.getChatRoomId());
+            return;
+        }
+        chatDto.setMessage(chatDto.getUsername() + "님이 참여하셨습니다.");
+        chatRoom.join(chatDto, session);
+        log.info("Updated chatRoomMap: {}", chatRoomMap.toString());
     }
 
     /**
      * 채팅방 퇴장
      * @param chatDto ChatDto
      */
-    private void exitChatRoom(String username, ChatDto chatDto) {
-        log.info("exit chatDto : " + chatDto.toString());
+    private void exitChatRoom(WebSocketSession session, ChatDto chatDto) {
+        log.info("exit chatDto : {}", chatDto.toString());
         chatDto.setMessage(chatDto.getUsername() + "님이 퇴장하셨습니다.");
         ChatRoom chatRoom = chatRoomMap.get(chatDto.getChatRoomId());
-        chatRoom.exit(username, chatDto);
+        log.info("chatRoomMap : {}", chatRoomMap.toString());
+        log.info("chatRoom : {}", chatRoom.toString());
+        chatRoom.exit(chatDto);
 
         if(chatRoom.getActiveUserMap().isEmpty()){
             chatRoomMap.remove(chatDto.getChatRoomId());
         }
+
+        try{
+            session.close();
+        } catch (Exception e){
+            log.error("Failed to close session: {}", e.getMessage());
+        }
     }
 }
-

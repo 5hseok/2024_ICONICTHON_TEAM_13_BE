@@ -14,12 +14,8 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @Table(name = "professor")
 public class Professor extends Member {
-    @Column(name = "number", nullable = false, unique = true)
-    private String number;
 
     @Column(name = "department", nullable = false)
     private String department;
 
-    @Column(name = "professor_image")
-    private String professorImage;
 }
