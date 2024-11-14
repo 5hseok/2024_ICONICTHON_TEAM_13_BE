@@ -1,4 +1,4 @@
-package com.prochord.PROCHORD_SERVER;
+package com.prochord.server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
