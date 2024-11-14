@@ -32,7 +32,7 @@ public class ChatMessage {
     private Long senderId;
 
     @Column(name = "sender_type", nullable = false)
-    private Boolean senderType;
+    private String senderType;
 
     @Column(name = "content", nullable = false)
     private String content;
@@ -40,4 +40,8 @@ public class ChatMessage {
     @Column(name = "sent", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date sent;
+
+    public void updateDate(Date sent){
+        this.sent = sent;
+    }
 }
