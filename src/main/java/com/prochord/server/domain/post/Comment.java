@@ -1,5 +1,6 @@
 package com.prochord.server.domain.post;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.prochord.server.domain.member.Professor;
 import com.prochord.server.domain.member.Student;
 import jakarta.persistence.*;
@@ -16,6 +17,7 @@ import java.util.Date;
 @Builder
 @Entity
 @Table(name = "comment")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -4,22 +4,27 @@ import com.prochord.server.domain.post.Comment;
 import com.prochord.server.domain.post.Likes;
 import com.prochord.server.domain.post.Post;
 import com.prochord.server.domain.post.Scrap;
+import com.prochord.server.dto.comment.response.CommentResponse;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PostResponse {
-    private final Long id;
-    private final String title;
-    private final String content;
-    private final String professorName;
-    private final Integer likesCount;
-    private final Integer scrapCount;
-    private final List<Comment> comments;
+    private Long id;
+    private String title;
+    private String content;
+    private String professorName;
+    private Integer likesCount;
+    private Integer scrapCount;
+    private List<CommentResponse> comments;
 
     public static PostResponse fromEntity(Post post) {
         return PostResponse.builder()
@@ -47,7 +52,7 @@ public class PostResponse {
                 .professorName(post.getProfessor().getName())
                 .likesCount(likes.size())
                 .scrapCount(scraps.size())
-                .comments(comments)
+                .comments(CommentResponse.fromEntities(comments))
                 .build();
     }
 }

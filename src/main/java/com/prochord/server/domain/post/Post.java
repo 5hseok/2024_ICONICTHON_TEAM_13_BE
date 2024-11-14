@@ -1,5 +1,6 @@
 package com.prochord.server.domain.post;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.prochord.server.domain.member.Professor;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +18,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "post")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,15 +40,27 @@ public class Post {
 
     // 좋아요 목록 추가
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Likes> likes;
+    private List<Likes> likes = new ArrayList<>();
 
     // 스크랩 목록 추가
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Scrap> scraps;
+    private List<Scrap> scraps = new ArrayList<>();
 
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+    public List<Likes> getLikes() {
+        if (this.likes == null) {
+            this.likes = new ArrayList<>();
+        }
+        return this.likes;
+    }
+    public List<Scrap> getScraps() {
+        if (this.scraps == null) {
+            this.scraps = new ArrayList<>();
+        }
+        return this.scraps;
     }
 
 }
