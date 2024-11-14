@@ -39,7 +39,7 @@ public class SecurityConfig {
                 exception.accessDeniedHandler(customAccessDeniedHandler);
             })
             .authorizeHttpRequests(auth -> {
-                auth.requestMatchers(new AntPathRequestMatcher("/ws/chat/**")).permitAll();
+                auth.requestMatchers(new AntPathRequestMatcher("/ws/**")).permitAll();
                 auth.requestMatchers(AUTH_WHITE_LIST).permitAll();
                 auth.anyRequest().authenticated();
             })
@@ -64,4 +64,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
+
 }
