@@ -41,11 +41,11 @@ jobs:
             cd /home/ubuntu/app
 #
 #            # 환경 변수 설정 (EC2에 직접 전달)
-#            export SPRING_PROFILES_ACTIVE=docker
-#            export SPRING_DATASOURCE_URL=${{ secrets.RDS_URL }}
-#            export SPRING_DATASOURCE_USERNAME=${{ secrets.RDS_USERNAME }}
-#            export SPRING_DATASOURCE_PASSWORD=${{ secrets.RDS_PASSWORD }}
-#            export JWT_SECRET=${{ secrets.JWT_SECRET }}
+            export SPRING_PROFILES_ACTIVE=docker
+            export SPRING_DATASOURCE_URL=${{ secrets.RDS_URL }}
+            export SPRING_DATASOURCE_USERNAME=${{ secrets.RDS_USERNAME }}
+            export SPRING_DATASOURCE_PASSWORD=${{ secrets.RDS_PASSWORD }}
+            export JWT_SECRET=${{ secrets.JWT_SECRET }}
 
             # Docker 이미지 pull 및 컨테이너 재실행
             docker pull 5hseok/prochord_server:0.0.1
