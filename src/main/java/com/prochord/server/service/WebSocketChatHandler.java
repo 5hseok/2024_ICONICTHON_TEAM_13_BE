@@ -1,11 +1,11 @@
-package com.prochord.server.utils;
+package com.prochord.server.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prochord.server.domain.chat.WebSocketMessage;
 import com.prochord.server.dto.chat.ChatDto;
+import com.prochord.server.utils.ChatRoom;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
