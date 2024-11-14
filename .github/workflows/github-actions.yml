@@ -15,20 +15,24 @@ jobs:
 
       # 2. Docker Hub 로그인
       - name: Log in to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
+      # 3. 현재 디렉토리 파일 리스트 확인 (디버깅 용도)
       - name: List files in current directory
         run: ls -la
 
-      # 3. Docker 이미지 빌드 및 테스트 실행 후 push
+      # 4. Docker 이미지 빌드 및 테스트 실행 후 push
       - name: Build Docker image for testing
-        run: docker buildx build --platform linux/amd64 --load --tag 5hseok/prochord_server:0.0.1 -f ./Dockerfile .
+        run: |
+          docker buildx build --platform linux/amd64 --load --tag 5hseok/prochord_server:0.0.1 -f ./Dockerfile .
 
-      # Docker Hub로 이미지 push
+      # 5. Docker Hub로 이미지 push
       - name: Push Docker image to Docker Hub
-        run: docker push 5hseok/prochord_server:0.0.1
+        run: |
+          docker push 5hseok/prochord_server:0.0.1
 
-      # 4. EC2에 SSH로 연결하여 배포
+      # 6. EC2에 SSH로 연결하여 배포
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v0.1.5
         with:
@@ -37,21 +41,20 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           script: |
-#             Docker Compose 파일이 있는 디렉토리로 이동
+            # Docker Compose 파일이 있는 디렉토리로 이동
             cd /home/ubuntu/app
-#
-#            # 환경 변수 설정 (EC2에 직접 전달)
-            export SPRING_PROFILES_ACTIVE=docker
-            export SPRING_DATASOURCE_URL=${{ secrets.RDS_URL }}
-            export SPRING_DATASOURCE_USERNAME=${{ secrets.RDS_USERNAME }}
-            export SPRING_DATASOURCE_PASSWORD=${{ secrets.RDS_PASSWORD }}
-            export JWT_SECRET=${{ secrets.JWT_SECRET }}
 
             # Docker 이미지 pull 및 컨테이너 재실행
-            docker pull 5hseok/prochord_server:0.0.1
+            sudo docker pull 5hseok/prochord_server:0.0.1
 
-            docker-compose down
-            docker-compose up --build -d
+            # 기존 컨테이너 종료 및 제거
+            if [ "$(sudo docker ps -q -f name=spring_app)" ]; then
+              sudo docker stop spring_app && sudo docker rm spring_app
+            fi
+
+            # Docker Compose를 사용하여 컨테이너 실행
+            sudo docker-compose down
+            sudo docker-compose up --build -d
 
             # spring_app 컨테이너의 로그 출력
-            docker logs spring_app
+            sudo docker logs spring_app
