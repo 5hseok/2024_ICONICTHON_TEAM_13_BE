@@ -36,6 +36,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ 22 }}
           script: |
             # 환경 변수를 설정
             export RDS_URL=${{ secrets.RDS_URL }}
