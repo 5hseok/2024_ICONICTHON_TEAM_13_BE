@@ -13,8 +13,8 @@ import lombok.Builder;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "like")
-public class Like {
+@Table(name = "likes")
+public class Likes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

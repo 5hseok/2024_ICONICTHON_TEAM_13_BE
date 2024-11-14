@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -33,5 +34,18 @@ public class Post {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "professor_id", nullable = false)
     private Professor professor;
+
+    // 좋아요 목록 추가
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Likes> likes;
+
+    // 스크랩 목록 추가
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Scrap> scraps;
+
+    public void update(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 
 }
