@@ -49,7 +49,7 @@ public class MemberService {
 
         // 유저 생성 - 학생 또는 교수 구분
         Member member;
-        if (memberCreateRequest.getUserType() == "학생") { // 학생인 경우
+        if (memberCreateRequest.getUserType() == 0) { // 학생인 경우
             member = Student.builder()
                     .name(memberCreateRequest.getName())
                     .birth(memberCreateRequest.getBirth())
@@ -59,7 +59,7 @@ public class MemberService {
                     .number(memberCreateRequest.getNumber())
                     .build();
             return MemberResponse.of(studentRepository.save((Student) member).getId());
-        } else if (memberCreateRequest.getUserType() == "교수") { // 교수인 경우
+        } else if (memberCreateRequest.getUserType() == 1) { // 교수인 경우
             member = Professor.builder()
                     .name(memberCreateRequest.getName())
                     .birth(memberCreateRequest.getBirth())
@@ -78,9 +78,9 @@ public class MemberService {
     @Transactional
     public MemberLoginResponse signIn(MemberLoginRequest memberLoginRequest) {
         Member member;
-        if (memberLoginRequest.getUserType() == "학생") { // 학생인 경우
+        if (memberLoginRequest.getUserType() == 0) { // 학생인 경우
             member = studentRepository.findByEmailOrElseThrow(memberLoginRequest.getEmail());
-        } else if (memberLoginRequest.getUserType() == "교수") { // 교수인 경우
+        } else if (memberLoginRequest.getUserType() == 1) { // 교수인 경우
             member = professorRepository.findByEmailOrElseThrow(memberLoginRequest.getEmail());
         } else {
             throw new BusinessException(ErrorMessage.InVALID_USERTYPE);
@@ -95,8 +95,9 @@ public class MemberService {
         String accessToken = jwtTokenProvider.issueAccessToken(
                 UserAuthentication.createUserAuthentication(member.getId())
         );
+        String userTypeString = memberLoginRequest.getUserType() == 0 ? "학생" : "교수";
 
-        return MemberLoginResponse.of(accessToken, String.valueOf(member.getId()), memberLoginRequest.getUserType());
+        return MemberLoginResponse.of(accessToken, String.valueOf(member.getId()), userTypeString);
     }
 
     @Transactional

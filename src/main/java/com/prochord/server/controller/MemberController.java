@@ -19,30 +19,34 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class MemberController {
 
-    private final MemberService userService;
+    private final MemberService memberService;
 
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.status(HttpStatus.OK).body("test");
+    }
     // 회원가입
     @PostMapping("/register")
     public ResponseEntity<SuccessStatusResponse<MemberResponse>> signUp(@Valid @RequestBody MemberCreateRequest userCreateRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.SIGNUP_SUCCESS, userService.signUp(userCreateRequest)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.SIGNUP_SUCCESS, memberService.signUp(userCreateRequest)));
     }
 
     // 로그인
     @PostMapping("/login")
     public ResponseEntity<SuccessStatusResponse<MemberLoginResponse>> signIn(@Valid @RequestBody MemberLoginRequest userLoginRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.SIGNIN_SUCCESS, userService.signIn(userLoginRequest)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.SIGNIN_SUCCESS, memberService.signIn(userLoginRequest)));
     }
 
     // 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<SuccessStatusResponse<MemberResponse>> logout(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.status(HttpStatus.OK).body(SuccessStatusResponse.of(SuccessMessage.LOGOUT_SUCCESS, userService.logout(token)));
+        return ResponseEntity.status(HttpStatus.OK).body(SuccessStatusResponse.of(SuccessMessage.LOGOUT_SUCCESS, memberService.logout(token)));
     }
 
     // 회원탈퇴
     @DeleteMapping("/users/delete")
     public ResponseEntity<SuccessStatusResponse<Void>> deleteAccount(@RequestHeader("Authorization") String token) {
-        userService.deleteAccount(token);
+        memberService.deleteAccount(token);
         return ResponseEntity.status(HttpStatus.OK).body(SuccessStatusResponse.of(SuccessMessage.ACCOUNT_DELETION_SUCCESS, null));
     }
 }

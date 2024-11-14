@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class MemberLoginRequest {
     private String email;
     private String password;
-    private String userType; // 0이면 학생, 1이면 교수
+    private Integer userType; // 0이면 학생, 1이면 교수
 }
