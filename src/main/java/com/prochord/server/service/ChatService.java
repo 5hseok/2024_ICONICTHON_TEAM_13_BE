@@ -20,6 +20,8 @@ public class ChatService {
     private final SimpMessagingTemplate messagingTemplate;
 
     public void handleChatMessage(ChatMessage chatMessage) {
+        System.out.println("Received message: " + chatMessage.getContent());
+
         // Redis를 통해 수신된 메시지를 MySQL에 저장
         chatMessage.updateDate(new Date()); // 메시지가 수신된 시간 설정
         chatMessageRepository.save(chatMessage);
