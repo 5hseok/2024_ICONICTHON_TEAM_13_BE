@@ -20,13 +20,15 @@ public class ChatService {
     private final SimpMessagingTemplate messagingTemplate;
 
     public void handleChatMessage(ChatMessage chatMessage) {
-        System.out.println("Received message: " + chatMessage.getContent());
+        log.info("Received chat message from room {}: {}", chatMessage.getChatRoom(), chatMessage.getContent());
 
         // Redis를 통해 수신된 메시지를 MySQL에 저장
         chatMessage.updateDate(new Date()); // 메시지가 수신된 시간 설정
-        chatMessageRepository.save(chatMessage);
+        ChatMessage savedMessage = chatMessageRepository.save(chatMessage);
+        log.info("Chat message saved to database with ID: {}", savedMessage.getId());
 
         // WebSocket을 통해 클라이언트에 메시지 전달
         messagingTemplate.convertAndSend("/topic/chat/" + chatMessage.getChatRoom(), chatMessage);
+        log.info("Chat message sent to WebSocket subscribers in room: /topic/chat/{}", chatMessage.getChatRoom());
     }
 }
