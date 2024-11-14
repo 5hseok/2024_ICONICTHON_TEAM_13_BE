@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 public class ChatDto {
     private String content;
-    private final Long chatRoomId;
+    private Long chatRoomId;
     private final String username;
 
     @JsonCreator
@@ -25,4 +25,9 @@ public class ChatDto {
     public void setMessage(String content) {
         this.content = content;
     }
+
+    public void chooseChatRoomId(Long chatRoomId) {
+        this.chatRoomId = chatRoomId;
+    }
+
 }

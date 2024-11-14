@@ -3,6 +3,7 @@ package com.prochord.server.chat.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prochord.server.chat.domain.WebSocketMessage;
+import com.prochord.server.chat.domain.WebSocketMessageType;
 import com.prochord.server.chat.dto.chat.ChatDto;
 import com.prochord.server.chat.service.ChatRoom;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,32 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
             case "EXIT" -> exitChatRoom(session, webSocketMessage.getPayload());
             case "JOIN" -> joinChatRoom(webSocketMessage.getPayload(), session);
         }
+    }
+
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) {
+        log.info("WebSocket connection established: {}", session.getId());
+
+        // 연결 후 고유한 ID 생성 후 클라이언트에게 전송
+        Long uniqueId = generateUniqueChatRoomId();
+
+        try {
+            ChatDto chatDto = new ChatDto(uniqueId, "system", "이 ID로 채팅방에 입장하세요.");
+            WebSocketMessage responseMessage = new WebSocketMessage(WebSocketMessageType.NEW_ID,chatDto);
+            String responsePayload = objectMapper.writeValueAsString(responseMessage);
+            session.sendMessage(new TextMessage(responsePayload));
+        } catch (IOException e) {
+            log.error("Failed to send unique ID to client: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * 새로운 고유한 채팅방 ID 생성
+     * @return 채팅방 ID
+     */
+    private Long generateUniqueChatRoomId() {
+        // 단순하게 현재 맵의 크기에 1을 더하는 방식으로 생성 (고유함을 보장하기 위해 다른 방식도 가능)
+        return (long) (chatRoomMap.size() + 1);
     }
 
     /**

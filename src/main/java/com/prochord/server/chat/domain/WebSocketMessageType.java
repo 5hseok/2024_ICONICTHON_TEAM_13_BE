@@ -9,7 +9,9 @@ public enum WebSocketMessageType {
     TALK("TALK"),
     EXIT("EXIT"),
     SUB("SUBSCRIBE"),
-    PUB("PUBLISH");
+    PUB("PUBLISH"),
+    NEW_ROOM("NEW_ROOM"),
+    NEW_ID("NEW_ID");
 
     private final String type;
 
