@@ -44,9 +44,6 @@ public class MemberService {
             throw new BusinessException(ErrorMessage.DUPLICATE_EMAIL);
         }
 
-        // 홀수면 남자, 짝수면 여자
-        String gender = memberCreateRequest.getGender();
-
         // 유저 생성 - 학생 또는 교수 구분
         Member member;
         if (memberCreateRequest.getUserType() == 0) { // 학생인 경우
@@ -95,7 +92,7 @@ public class MemberService {
         );
         String userTypeString = memberLoginRequest.getUserType() == 0 ? "학생" : "교수";
 
-        return MemberLoginResponse.of(accessToken, String.valueOf(member.getId()), userTypeString);
+        return MemberLoginResponse.of(accessToken, String.valueOf(member.getId()), member.getName(), userTypeString);
     }
 
     @Transactional

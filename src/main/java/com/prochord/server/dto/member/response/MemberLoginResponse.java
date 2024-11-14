@@ -9,7 +9,8 @@ public record MemberLoginResponse(
     public static MemberLoginResponse of(
         String accessToken,
         String userId,
-        String userName
+        String userName,
+        String userType
     ) {
         return new MemberLoginResponse(accessToken, userId, userName);
     }
