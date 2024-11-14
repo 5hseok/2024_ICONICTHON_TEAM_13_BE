@@ -9,6 +9,7 @@ RUN chmod +x gradlew
 # 의존성 파일 복사 및 다운로드
 COPY build.gradle .
 COPY settings.gradle .
+COPY src/main/resources/application.yml .
 
 # 의존성 다운로드
 RUN ./gradlew dependencies

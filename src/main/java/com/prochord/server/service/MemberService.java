@@ -45,7 +45,7 @@ public class MemberService {
         }
 
         // 홀수면 남자, 짝수면 여자
-        String gender = (memberCreateRequest.getGender() % 2 == 0) ? "여자" : "남자";
+        String gender = memberCreateRequest.getGender();
 
         // 유저 생성 - 학생 또는 교수 구분
         Member member;
@@ -55,7 +55,7 @@ public class MemberService {
                     .birth(memberCreateRequest.getBirth())
                     .email(memberCreateRequest.getEmail())
                     .password(passwordEncoder.encode(memberCreateRequest.getPassword()))
-                    .gender(gender.equals("여자"))
+                    .gender(memberCreateRequest.getGender())
                     .number(memberCreateRequest.getNumber())
                     .build();
             return MemberResponse.of(studentRepository.save((Student) member).getId());
@@ -65,7 +65,7 @@ public class MemberService {
                     .birth(memberCreateRequest.getBirth())
                     .email(memberCreateRequest.getEmail())
                     .password(passwordEncoder.encode(memberCreateRequest.getPassword()))
-                    .gender(gender.equals("여자"))
+                    .gender(memberCreateRequest.getGender())
                     .number(memberCreateRequest.getNumber())
                     .department(memberCreateRequest.getDepartment())
                     .build();

@@ -28,5 +28,5 @@ public abstract class Member {
     private String birth;
 
     @Column(name = "gender")
-    private Boolean gender;
+    private String gender;
 }
