@@ -11,9 +11,16 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.stereotype.Component;
 
 @Configuration
 public class RedisConfig {
+
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+        // 호스트와 포트를 적절히 설정합니다. 기본값으로 localhost:6379을 사용합니다.
+        return new LettuceConnectionFactory("redis_cache", 6379);
+    }
 
     @Bean
     public RedisMessageListenerContainer redisContainer(RedisConnectionFactory connectionFactory,
@@ -32,12 +39,6 @@ public class RedisConfig {
     @Bean
     public ChannelTopic topic() {
         return new ChannelTopic("chat");
-    }
-
-    @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
-        // 호스트와 포트를 적절히 설정합니다. 기본값으로 localhost:6379을 사용합니다.
-        return new LettuceConnectionFactory("localhost", 6379);
     }
 
     @Bean
