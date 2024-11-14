@@ -1,10 +1,10 @@
-package com.prochord.server.service;
+package com.prochord.server.chat.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.prochord.server.domain.chat.WebSocketMessage;
-import com.prochord.server.dto.chat.ChatDto;
-import com.prochord.server.utils.ChatRoom;
+import com.prochord.server.chat.domain.WebSocketMessage;
+import com.prochord.server.chat.dto.chat.ChatDto;
+import com.prochord.server.chat.service.ChatRoom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -25,11 +25,34 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws JsonProcessingException {
         String username = (String) session.getAttributes().get("username");
-        WebSocketMessage webSocketMessage = (WebSocketMessage) objectMapper.readValue(message.getPayload(), WebSocketMessage.class);
+        WebSocketMessage webSocketMessage = objectMapper.readValue(message.getPayload(), WebSocketMessage.class);
+
         switch (webSocketMessage.getType().getValue()) {
             case "ENTER" -> enterChatRoom(webSocketMessage.getPayload(), session);
-            case "TALK" -> sendMessage(username, webSocketMessage.getPayload());
-            case "EXIT" -> exitChatRoom(username, webSocketMessage.getPayload());
+            case "TALK" -> {
+                ChatDto chatDto = webSocketMessage.getPayload();
+                ChatRoom chatRoom = chatRoomMap.get(chatDto.getChatRoomId());
+                if (chatRoom == null) {
+                    log.error("Chat room with ID {} does not exist. Message cannot be delivered.", chatDto.getChatRoomId());
+                    try {
+                        session.sendMessage(new TextMessage("Error: Chat room does not exist."));
+                    } catch (Exception e) {
+                        log.error("Failed to send error message to user {}: {}", username, e.getMessage());
+                    }
+                } else {
+                    sendMessage(username, chatDto);
+                }
+            }
+            case "EXIT" -> {
+                ChatDto chatDto = webSocketMessage.getPayload();
+                ChatRoom chatRoom = chatRoomMap.get(chatDto.getChatRoomId());
+                if (chatRoom != null) {
+                    exitChatRoom(username, chatDto);
+                } else {
+                    log.warn("User {} attempted to exit a non-existent chat room with ID {}", username, chatDto.getChatRoomId());
+                }
+            }
+            default -> log.warn("Unsupported message type received: {}", webSocketMessage.getType().getValue());
         }
     }
 
@@ -54,6 +77,7 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
         ChatRoom chatRoom = chatRoomMap.getOrDefault(chatDto.getChatRoomId(), new ChatRoom(objectMapper));
         chatRoom.enter(chatDto, session);
         chatRoomMap.put(chatDto.getChatRoomId(), chatRoom);
+        log.info("Chat room {} added to chatRoomMap.", chatDto.getChatRoomId());
     }
 
     /**

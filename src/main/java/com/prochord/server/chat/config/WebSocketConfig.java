@@ -1,7 +1,7 @@
-package com.prochord.server.config;
+package com.prochord.server.chat.config;
 
 //import com.prochord.server.utils.WebSocketAuthInterceptor;
-import com.prochord.server.service.WebSocketChatHandler;
+import com.prochord.server.chat.util.WebSocketChatHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.*;

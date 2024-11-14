@@ -1,4 +1,4 @@
-package com.prochord.server.dto.chat;
+package com.prochord.server.chat.dto.chat;
 
 
 import com.fasterxml.jackson.annotation.JsonCreator;

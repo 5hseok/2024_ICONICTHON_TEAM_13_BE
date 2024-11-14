@@ -1,8 +1,8 @@
-package com.prochord.server.domain.chat;
+package com.prochord.server.chat.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.prochord.server.dto.chat.ChatDto;
+import com.prochord.server.chat.dto.chat.ChatDto;
 import lombok.Getter;
 
 /**

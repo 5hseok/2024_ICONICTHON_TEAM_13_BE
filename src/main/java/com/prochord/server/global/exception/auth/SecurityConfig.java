@@ -39,7 +39,7 @@ public class SecurityConfig {
                 exception.accessDeniedHandler(customAccessDeniedHandler);
             })
             .authorizeHttpRequests(auth -> {
-                auth.requestMatchers(new AntPathRequestMatcher("/ws/**")).permitAll();
+                auth.requestMatchers(new AntPathRequestMatcher("/chats/**")).permitAll();
                 auth.requestMatchers(AUTH_WHITE_LIST).permitAll();
                 auth.anyRequest().authenticated();
             })

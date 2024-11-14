@@ -1,4 +1,4 @@
-package com.prochord.server.domain.chat;
+package com.prochord.server.chat.domain;
 
 /**
  * 웹소켓 메시지 타입
