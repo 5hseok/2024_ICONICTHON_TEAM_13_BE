@@ -6,6 +6,7 @@ import com.prochord.server.domain.chat.WebSocketMessage;
 import com.prochord.server.dto.chat.ChatDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -15,7 +16,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 public class WebSocketChatHandler extends TextWebSocketHandler {
     private final Map<Long, ChatRoom> chatRoomMap = new ConcurrentHashMap<>();

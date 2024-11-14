@@ -18,8 +18,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
     private final WebSocketChatHandler webSocketChatHandler;
     private final WebSocketAuthInterceptor webSocketAuthInterceptor;
 
-    private static final Logger logger = (Logger) LoggerFactory.getLogger(WebSocketConfig.class);
-
 
 //    @Override
 //    public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -34,7 +32,5 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         // WebSocket 연결할 엔드포인트 설정
         registry.addHandler(webSocketChatHandler, "/chats").addInterceptors(webSocketAuthInterceptor).setAllowedOrigins("*");
-        logger.info("STOMP endpoint registered at /ws/chat with SockJS support and allowed origin patterns: *");
-
     }
 }
