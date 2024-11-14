@@ -45,9 +45,8 @@ jobs:
             # Docker Compose 파일이 있는 디렉토리로 이동
             cd /home/ubuntu/app
             
-            docker-compose down
-            docker-compose pull
-            docker-compose up -d
+            docker pull 5hseok/prochord_server:0.0.1
+            docker run -d --name 5hseok/prochord_server -p 8080:8080 5hseok/prochord_server:0.0.1
             
             # spring_app 컨테이너의 로그 출력
             docker logs spring_app
